@@ -1,5 +1,5 @@
 import moment from "moment";
-import type { Contract } from "./../models/models";
+import type { CalculateResult, Contract } from "./../models/models";
 
 const minSalary: number = 460;
 export class Calculator {
@@ -8,16 +8,24 @@ export class Calculator {
     this.contract = contract;
   }
 
-  getTime() {
-    this.contract.firstDate;
-    this.contract.lastDate;
-    let diffInDate = moment(this.contract.lastDate).diff(
-      moment(this.contract.firstDate),
-      "days"
-    );
+  getResult(): CalculateResult[] {
+    let result: CalculateResult[] = [];
+    result.push({
+      label: "Decimo cuarto",
+      value: this.#calculateDecimocuarto(),
+    });
+    result.push({
+      label: "Decimo tercero",
+      value: this.#calculateDecimotercero(),
+    });
+    result.push({
+      label: "Vacaciones",
+      value: this.#calculateHolyDays(),
+    });
+    return result;
   }
 
-  calculateDecimocuarto() {
+  #calculateDecimocuarto() {
     let decimocuarto = 0;
     if (!this.contract.decimoCuarto) {
       decimocuarto = this.#getDecimoDiff() * (this.contract.lastPay / 12);
@@ -29,7 +37,7 @@ export class Calculator {
     return decimocuarto;
   }
 
-  calculateDecimotercero() {
+  #calculateDecimotercero() {
     let decimotercero = 0;
     if (!this.contract.decimoTercero) {
       decimotercero = this.#getDecimoDiff() * (minSalary / 12);
@@ -40,7 +48,7 @@ export class Calculator {
     return decimotercero;
   }
 
-  calculateHolyDays() {
+  #calculateHolyDays() {
     let holyDaysPayment = 0;
     if (this.contract.vacations > 0) {
       holyDaysPayment = (this.contract.lastPay / 2) * this.contract.vacations;
