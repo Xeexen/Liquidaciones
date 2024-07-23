@@ -4,16 +4,19 @@ import Select from 'primevue/select';
 import RadioButton from 'primevue/radiobutton';
 import DatePicker from 'primevue/datepicker';
 import InputNumber from 'primevue/inputnumber';
+import Checkbox from 'primevue/checkbox';
+import Panel from 'primevue/panel';
+import Button from 'primevue/button';
 
 interface liquidacion {
     liquidacion: number;
     mes: number;
 }
 
-const region = ref();
+const region = ref("1");
 const firstDate = ref();
 const lastDate = ref();
-const lastPay= ref();
+const lastPay = ref();
 const decimoTercero = ref();
 const decimoCuarto = ref();
 const vacations = ref();
@@ -31,67 +34,69 @@ const liquidaciones = ref<liquidacion[]>([])
 
 const calc = () => {
     liquidaciones.value.map(x => {
-        
+
 
     })
 }
 </script>
 <template>
-    <div>
-        <h1 class="title">Calculadora de Liquidaciones</h1>
-    </div>
-    <div class="">
-        <Select v-model="contractType" :options="contracts" optionLabel="name" placeholder="Tipo de contrato" />
-    </div>
-    <div>
-        <div class="flex flex-wrap gap-4">
-            <div class="flex items-center">
-                <RadioButton v-model="region" inputId="ingredient1" name="pizza" value="1" />
-                <label for="ingredient1" class="ml-2">Sierra</label>
+    <div class="flex flex-col items-center gap-4 py-4">
+        <div>
+            <h1 class="text-2xl font-semibold">Calculadora de Liquidaciones</h1>
+        </div>
+        <Panel header="Tipo de contrato" class="min-w-[300px] w-3/5">
+            <div class="flex flex-col w-full gap-4">
+                <Select v-model="contractType" :options="contracts" optionLabel="name" placeholder="Tipo de contrato" />
+                <div class="flex justify-end w-full gap-4">
+                    <div class="flex items-center">
+                        <RadioButton v-model="region" inputId="ingredient1" name="pizza" value="1" />
+                        <label for="ingredient1" class="ml-2">Sierra</label>
+                    </div>
+                    <div class="flex items-center">
+                        <RadioButton v-model="region" inputId="ingredient2" name="pizza" value="2" />
+                        <label for="ingredient2" class="ml-2">Costa</label>
+                    </div>
+                    <div class="flex items-center">
+                        <RadioButton v-model="region" inputId="ingredient3" name="pizza" value="3" />
+                        <label for="ingredient3" class="ml-2">Oriente</label>
+                    </div>
+                    <div class="flex items-center">
+                        <RadioButton v-model="region" inputId="ingredient4" name="pizza" value="4" />
+                        <label for="ingredient4" class="ml-2">Insular</label>
+                    </div>
+                </div>
+
             </div>
-            <div class="flex items-center">
-                <RadioButton v-model="region" inputId="ingredient2" name="pizza" value="2" />
-                <label for="ingredient2" class="ml-2">Costa</label>
+        </Panel>
+        <Panel header="Fechas de contrato" class="min-w-[300px] w-3/5">
+            <div class="flex flex-col w-full gap-4">
+                <DatePicker v-model="firstDate" showIcon fluid :showOnFocus="true" placeholder="Fecha de inicio" />
+                <DatePicker v-model="lastDate" showIcon fluid :showOnFocus="true" placeholder="Fecha de fin" />
             </div>
-            <div class="flex items-center">
-                <RadioButton v-model="region" inputId="ingredient3" name="pizza" value="3" />
-                <label for="ingredient3" class="ml-2">Oriente</label>
+        </Panel>
+        <Panel header="Detalles de cobros" class="min-w-[300px] w-3/5">
+            <div class="flex flex-col w-full gap-4">
+                <InputNumber v-model="lastPay" inputId="stacked-buttons" mode="currency" currency="USD"
+                    placeholder="Ultima remuneracion recibida ($)" />
             </div>
-            <div class="flex items-center">
-                <RadioButton v-model="region" inputId="ingredient4" name="pizza" value="4" />
-                <label for="ingredient4" class="ml-2">Insular</label>
+            <div class="flex flex-col w-full mt-3">
+                <InputNumber v-model="vacations" inputId="withoutgrouping" :useGrouping="false"
+                    placeholder="Vacaciones sin Gozar" />
             </div>
-        </div>
-    </div>
-    <div>
-        <div class="">
-            <label>Fecha de inicio de relacion laboral</label>
-            <DatePicker v-model="firstDate" showIcon iconDisplay="input" />
-        </div>
-        <div>
-            <label>Fecha de inicio de relacion laboral</label>
-            <DatePicker v-model="lastDate" showIcon iconDisplay="input" />
-        </div>
-        <div>
-            <label>Ultima remuneracion recibida ($) <span class="text-red-100">*</span></label>
-            <InputNumber v-model="lastPay" inputId="stacked-buttons" showButtons mode="currency" currency="USD" />
-        </div>
-        <div>
-            <label>Mensualiza Decimotercera Remuneración:</label>
-            <Checkbox v-model="decimoTercero" :binary="true" />
-        </div>
-        <div>
-            <label>Mensualiza Decimocuarta Remuneración:</label>
-            <Checkbox v-model="decimoCuarto" :binary="true" />
-        </div>
-        <div>
-            <label>Número de Días de Vacaciones sin Gozar en el Último Periodo:*</label>
-            <InputNumber v-model="vacations" inputId="withoutgrouping" :useGrouping="false" />
-        </div>
-    </div>
-    <div>
-        <div>
-            <button @click="calc">Calcular Liquidaciones</button>
+            <div class="flex gap-4 mt-3">
+                <div class="flex items-center">
+                    <Checkbox v-model="decimoTercero" :binary="true" />
+                    <label for="ingredient1" class="ml-2"> Mensualiza Decimotercera </label>
+                </div>
+                <div class="flex items-center">
+                    <Checkbox v-model="decimoCuarto" :binary="true" />
+                    <label for="ingredient1" class="ml-2"> Mensualiza Decimocuarto </label>
+                </div>
+            </div>
+
+        </Panel>
+        <div class="flex justify-end min-w-[300px] w-3/5">
+            <Button label="Submit" @click="calc" />
         </div>
     </div>
 </template>
