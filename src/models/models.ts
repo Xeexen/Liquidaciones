@@ -14,3 +14,8 @@ export interface Contract {
   decimoTercero: false;
   decimoCuarto: false;
 }
+
+export interface CalculateResult {
+  label: string;
+  value: number;
+}
