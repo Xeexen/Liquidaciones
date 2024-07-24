@@ -5,13 +5,15 @@ import RadioButton from "primevue/radiobutton";
 import DatePicker from "primevue/datepicker";
 import InputNumber from "primevue/inputnumber";
 import Checkbox from "primevue/checkbox";
+import Drawer from "primevue/drawer";
 import Panel from "primevue/panel";
 import Button from "primevue/button";
-import type { Contract, ContractsType } from "@/models/models";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import type { CalculateResult, Contract, ContractsType } from "@/models/models";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { Calculator } from "@/service/Calculator";
-import moment from "moment";
 
 const rule = {
   region: { required },
@@ -32,7 +34,7 @@ const contrac = ref<Contract>({
 } as Contract);
 
 const validator = useVuelidate(rule, contrac);
-
+const visible = ref(false);
 const contractsType = ref<ContractsType[]>([
   {
     code: "1",
@@ -86,34 +88,34 @@ const contractsType = ref<ContractsType[]>([
   },
 ]);
 
-// const countHolidays = (lastDate: string, firstDate: string) => {
-//   const lastDateMoment = moment(lastDate);
-//   const firstDateMoment = moment(firstDate);
+const result = ref<CalculateResult[]>([]);
 
-//   if (firstDateMoment.year() == lastDateMoment.year()) {
-//     const totalDays = lastDateMoment.diff(firstDateMoment, "days");
-//     const totalHolidays = totalDays * 0.0410958904109589;
-//     return parseFloat(totalHolidays.toFixed(2));   
-//   } else {
-//     const startOfYear = moment().year(lastDateMoment.year()).startOf("year");
-//     const totalDays = lastDateMoment.diff(startOfYear, "days"); // +1 para incluir el último día
-//     const totalHolidays = totalDays * 0.0410958904109589;
-//     return parseFloat(totalHolidays.toFixed(2));  
-//   }
-// };
-
-const calc = () => {
+const onCalculate = () => {
   validator.value.$validate();
   if (!validator.value.$error) {
-    let cal = new Calculator(contrac.value);
+    result.value = new Calculator(contrac.value).getResult();
+    visible.value = true;
   }
+};
+
+const onClear = () => {
+  validator.value.$reset();
+  visible.value = false;
+  result.value = [];
+  contrac.value = {
+    region: "1",
+    contractType: {
+      code: "1",
+      name: "Por acuerdo de las partes",
+      rate: 1,
+    },
+  } as Contract;
 };
 </script>
 <template>
   <div class="flex flex-col items-center gap-4 py-4">
     <div>
       <h1 class="text-2xl font-semibold">Calculadora de Liquidaciones</h1>
-      {{ new Calculator(contrac).getResult() }}
     </div>
     <Panel header="Tipo de contrato" class="min-w-[300px] w-3/5">
       <div class="flex flex-col w-full gap-4">
@@ -204,7 +206,6 @@ const calc = () => {
           :max="15"
           :invalid="validator.vacations.$error"
         />
-        <!-- {{ countHolidays(contrac.lastDate) }} -->
       </div>
       <div class="flex gap-4 mt-3">
         <div class="flex items-center">
@@ -221,9 +222,41 @@ const calc = () => {
         </div>
       </div>
     </Panel>
-    <div class="flex justify-end min-w-[300px] w-3/5">
-      <Button label="Submit" @click="calc" />
+    <div class="flex justify-end min-w-[300px] w-3/5 gap-4">
+      <Button label="limpiar" @click="onClear" />
+      <Button label="Calcular" @click="onCalculate" />
     </div>
+    <Drawer v-model:visible="visible" header="Liquidacion" position="full">
+      <DataTable :value="result">
+        <Column field="label" header="Nombre">
+          <template #body="slotProps">
+            <p
+              :class="
+                slotProps.index == result.length - 1
+                  ? 'font-semibold text-lg'
+                  : ''
+              "
+            >
+              {{ slotProps.data.label }}
+            </p>
+          </template>
+        </Column>
+        <Column field="value" header="Valor">
+          <template #body="slotProps">
+            <p
+              class="font-semibold text-green-600"
+              :class="
+                slotProps.index == result.length - 1
+                  ? 'font-semibold text-lg'
+                  : ''
+              "
+            >
+              ${{ slotProps.data.value.toFixed(2) }}
+            </p>
+          </template>
+        </Column>
+      </DataTable>
+    </Drawer>
   </div>
 </template>
 
