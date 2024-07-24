@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import CalculadoraLiquidaciones from './components/CalculadoraLiquidaciones.vue'
+import CalculadoraLiquidaciones from "./components/CalculadoraLiquidaciones.vue";
 </script>
 
 <template>
@@ -9,6 +8,4 @@ import CalculadoraLiquidaciones from './components/CalculadoraLiquidaciones.vue'
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
