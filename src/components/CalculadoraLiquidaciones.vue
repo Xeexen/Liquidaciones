@@ -11,6 +11,7 @@ import type { Contract, ContractsType } from "@/models/models";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { Calculator } from "@/service/Calculator";
+import moment from "moment";
 
 const rule = {
   region: { required },
@@ -23,6 +24,11 @@ const rule = {
 
 const contrac = ref<Contract>({
   region: "1",
+  contractType: {
+    code: "1",
+    name: "Por acuerdo de las partes",
+    rate: 1,
+  },
 } as Contract);
 
 const validator = useVuelidate(rule, contrac);
@@ -58,7 +64,44 @@ const contractsType = ref<ContractsType[]>([
     name: "Por voluntad del empleador previo visto bueno. ",
     rate: 1,
   },
+  {
+    code: "7",
+    name: "Por voluntad del trabajador previo visto bueno",
+    rate: 1,
+  },
+  {
+    code: "8",
+    name: "Por desahucio",
+    rate: 1,
+  },
+  {
+    code: "9",
+    name: "Por despido intempestivo",
+    rate: 1,
+  },
+  {
+    code: "10",
+    name: "Por Terminación dentro del periodo de prueba",
+    rate: 1,
+  },
 ]);
+
+// const countHolidays = (lastDate: string, firstDate: string) => {
+//   const lastDateMoment = moment(lastDate);
+//   const firstDateMoment = moment(firstDate);
+
+//   if (firstDateMoment.year() == lastDateMoment.year()) {
+//     const totalDays = lastDateMoment.diff(firstDateMoment, "days");
+//     const totalHolidays = totalDays * 0.0410958904109589;
+//     return parseFloat(totalHolidays.toFixed(2));   
+//   } else {
+//     const startOfYear = moment().year(lastDateMoment.year()).startOf("year");
+//     const totalDays = lastDateMoment.diff(startOfYear, "days"); // +1 para incluir el último día
+//     const totalHolidays = totalDays * 0.0410958904109589;
+//     return parseFloat(totalHolidays.toFixed(2));  
+//   }
+// };
+
 const calc = () => {
   validator.value.$validate();
   if (!validator.value.$error) {
@@ -70,6 +113,7 @@ const calc = () => {
   <div class="flex flex-col items-center gap-4 py-4">
     <div>
       <h1 class="text-2xl font-semibold">Calculadora de Liquidaciones</h1>
+      {{ new Calculator(contrac).getResult() }}
     </div>
     <Panel header="Tipo de contrato" class="min-w-[300px] w-3/5">
       <div class="flex flex-col w-full gap-4">
@@ -160,6 +204,7 @@ const calc = () => {
           :max="15"
           :invalid="validator.vacations.$error"
         />
+        <!-- {{ countHolidays(contrac.lastDate) }} -->
       </div>
       <div class="flex gap-4 mt-3">
         <div class="flex items-center">

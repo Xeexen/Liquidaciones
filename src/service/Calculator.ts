@@ -1,5 +1,6 @@
 import moment from "moment";
 import type { CalculateResult, Contract } from "./../models/models";
+import { isLabeledStatement } from "typescript";
 
 const minSalary: number = 460;
 export class Calculator {
@@ -19,8 +20,8 @@ export class Calculator {
       value: this.#calculateDecimotercero(),
     });
     result.push({
-      label: "Vacaciones",
-      value: this.#calculateHolyDays(),
+      label: "Desahucio",
+      value: this.#calculateDesahucio(),
     });
     return result;
   }
@@ -82,5 +83,40 @@ export class Calculator {
       default:
         return 8;
     }
+  }
+
+  #calculateDesahucio() {
+    let result = 0;
+    let contractType = this.contract.contractType;
+    this.contract.lastPay // salario
+    switch (contractType.code) {
+      case "1":
+        result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
+        break;
+      case "2":
+        result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
+        break;
+      case "7":
+        result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
+        break;
+      case "8":
+        result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
+      break;
+      case "9":
+        result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
+      break;
+      default:
+        break;
+    }
+    return result;
+  }
+
+  #getDesahucioDiff() {
+    let diffInYears = 0;
+    diffInYears = moment(this.contract.lastDate).diff(
+      moment(this.contract.firstDate),
+      "years"
+    );
+    return diffInYears;
   }
 }
