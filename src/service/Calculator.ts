@@ -1,6 +1,5 @@
 import moment from "moment";
 import type { CalculateResult, Contract } from "./../models/models";
-import { isLabeledStatement } from "typescript";
 
 const minSalary: number = 460;
 export class Calculator {
@@ -20,8 +19,25 @@ export class Calculator {
       value: this.#calculateDecimotercero(),
     });
     result.push({
+      label: "Vacaciones",
+      value: this.#calculateHolyDays(),
+    });
+    result.push({
+      label: "Indemnización Despido Intempestivo",
+      value: this.#calculateInde(),
+    });
+    result.push({
       label: "Desahucio",
       value: this.#calculateDesahucio(),
+    });
+    let total = result.reduce((acc, el) => {
+      acc = acc + el.value;
+      return acc;
+    }, 0);
+
+    result.push({
+      label: "TOTAL",
+      value: total,
     });
     return result;
   }
@@ -52,7 +68,7 @@ export class Calculator {
   #calculateHolyDays() {
     let holyDaysPayment = 0;
     if (this.contract.vacations > 0) {
-      holyDaysPayment = (this.contract.lastPay / 2) * this.contract.vacations;
+      holyDaysPayment = (this.contract.lastPay / 24) * this.contract.vacations;
     }
     return holyDaysPayment;
   }
@@ -88,7 +104,6 @@ export class Calculator {
   #calculateDesahucio() {
     let result = 0;
     let contractType = this.contract.contractType;
-    this.contract.lastPay // salario
     switch (contractType.code) {
       case "1":
         result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
@@ -101,12 +116,24 @@ export class Calculator {
         break;
       case "8":
         result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
-      break;
+        break;
       case "9":
         result = this.contract.lastPay * 0.25 * this.#getDesahucioDiff();
-      break;
+        break;
       default:
         break;
+    }
+    return result;
+  }
+
+  #calculateInde() {
+    let result = 0;
+    let contractType = this.contract.contractType;
+    if (contractType.code == "9") {
+      let diff = this.#getIndepDiff() < 3 ? 3 : this.#getIndepDiff();
+      let first = (this.contract.lastPay / 4) * diff;
+      let second = this.contract.lastPay * 3;
+      result = first + second;
     }
     return result;
   }
@@ -118,5 +145,14 @@ export class Calculator {
       "years"
     );
     return diffInYears;
+  }
+
+  #getIndepDiff() {
+    let diffInYearsRounded = 0;
+    diffInYearsRounded = moment(this.contract.lastDate).diff(
+      moment(this.contract.firstDate),
+      "years"
+    );
+    return Math.ceil(diffInYearsRounded);
   }
 }
