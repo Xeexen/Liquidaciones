@@ -117,13 +117,16 @@ const onClear = () => {
     <div>
       <h1 class="text-2xl font-semibold">Calculadora de Liquidaciones</h1>
     </div>
-    <Panel header="Tipo de contrato" class="min-w-[300px] w-3/5">
+    <Panel
+      header="Causales de Terminación del Contrato Individual"
+      class="min-w-[300px] w-3/5"
+    >
       <div class="flex flex-col w-full gap-4">
         <Select
           v-model="contrac.contractType"
           :options="contractsType"
           optionLabel="name"
-          placeholder="Tipo de contrato"
+          placeholder="Tipo de terminación"
           :invalid="validator.contractType.$error"
         />
         <div class="flex justify-end w-full gap-4">
